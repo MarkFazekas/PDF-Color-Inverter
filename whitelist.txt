@@ -1,0 +1,10 @@
+pydantic
+pymupdf
+antialiasing
+rasterize
+rasterized
+luminance
+pdf
+PDF
+DPI
+CLI

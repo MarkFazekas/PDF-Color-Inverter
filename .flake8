@@ -1,0 +1,31 @@
+[flake8]
+extend-select = B901,B902,B903
+ignore =
+    E501,
+    B042,
+    N818,
+    ANN101,
+    ANN102,
+    WPS305,
+    WPS237,
+per-file-ignores =
+    **/tests/*: S101,WPS201,WPS204,WPS210,WPS226,WPS235
+max_complexity = 8
+max_line_length = 120
+statistics = True
+count = True
+inline-quotes = double
+max-string-usages = 5
+max-name-length = 50
+max-module-members = 20
+max-local-variables = 10
+max-try-body-length = 2
+max-line-complexity = 13
+max-imports = 15
+max-methods = 10
+max-import-from-members = 15
+docstring-convention = google
+docstring_style = google
+strictness = long
+eradicate-aggressive = True
+dictionaries = en_US,python,technical

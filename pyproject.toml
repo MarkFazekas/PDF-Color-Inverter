@@ -1,0 +1,118 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdf-color-inverter"
+version = "0.1.0"
+description = "High-resolution PDF color inverter with optional one-sided threshold flattening."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Mark Fazekas" },
+]
+dependencies = [
+    "numpy==2.3.5",
+    "PyMuPDF==1.26.7",
+    "pydantic==2.13.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "flake8==7.3.0",
+    "flake8-annotations==3.2.0",
+    "flake8-assertive==2.2.0",
+    "flake8-bugbear==25.11.29",
+    "flake8-builtins==3.1.0",
+    "flake8-comprehensions==3.17.0",
+    "flake8-eradicate==1.5.0",
+    "flake8-print==5.0.0",
+    "flake8-pydantic==0.4.0",
+    "flake8-spellcheck==0.28.0",
+    "mypy==2.3.0",
+    "pep8-naming==0.15.1",
+    "pyinstaller>=6.16,<7",
+    "pytest==9.1.1",
+    "ruff==0.16.0",
+    "wemake-python-styleguide==1.7.0",
+]
+
+[project.scripts]
+pdf-color-inverter = "pdf_color_inverter.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["pymupdf"]
+ignore_missing_imports = true
+
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["ALL"]
+external = ["WPS"]
+ignore = [
+    "COM812",
+    "CPY001",
+    "D104",
+    "D203",
+    "D213",
+    "E501",
+    "N818",
+    "S101",
+]
+fixable = ["I", "TC"]
+unfixable = ["B"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["SLF001"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
