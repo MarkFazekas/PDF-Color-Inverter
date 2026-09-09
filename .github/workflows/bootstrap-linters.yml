@@ -20,11 +20,11 @@ jobs:
         run: |
           python -m venv .lint-venv
           .lint-venv/bin/python -m pip install -e ".[dev]"
-      - name: Pack site-packages
+      - name: Pack linter runtime
         run: |
-          tar -C .lint-venv/lib/python3.13 -czf lint-site-packages.tar.gz site-packages
+          tar -C .lint-venv -czf lint-runtime.tar.gz lib/python3.13/site-packages bin/ruff
       - uses: actions/upload-artifact@v4
         with:
-          name: lint-site-packages
-          path: lint-site-packages.tar.gz
+          name: lint-runtime
+          path: lint-runtime.tar.gz
           if-no-files-found: error
