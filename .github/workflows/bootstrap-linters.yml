@@ -1,0 +1,30 @@
+name: Bootstrap linters
+
+on:
+  push:
+    branches:
+      - tooling-bootstrap
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install development dependencies
+        run: |
+          python -m venv .lint-venv
+          .lint-venv/bin/python -m pip install -e ".[dev]"
+      - name: Pack site-packages
+        run: |
+          tar -C .lint-venv/lib/python3.13 -czf lint-site-packages.tar.gz site-packages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lint-site-packages
+          path: lint-site-packages.tar.gz
+          if-no-files-found: error
