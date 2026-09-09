@@ -1,0 +1,102 @@
+name: Release executables
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: pdf-color-inverter-linux-x64
+          - os: windows-latest
+            artifact: pdf-color-inverter-windows-x64
+          - os: macos-15-intel
+            artifact: pdf-color-inverter-macos-x64
+          - os: macos-15
+            artifact: pdf-color-inverter-macos-arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Verify release tag matches project version
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          import tomllib
+          from pathlib import Path
+
+          version = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+          tag = os.environ["GITHUB_REF_NAME"]
+          expected = f"v{version}"
+          if tag != expected:
+              raise SystemExit(f"Release tag {tag!r} does not match project version {expected!r}")
+          PY
+
+      - name: Install package and PyInstaller
+        run: python -m pip install -e ".[dev]"
+
+      - name: Build executable
+        shell: bash
+        env:
+          ARTIFACT: ${{ matrix.artifact }}
+        run: |
+          python -m PyInstaller \
+            --onefile \
+            --clean \
+            --paths src \
+            --name "$ARTIFACT" \
+            src/pdf_color_inverter/__main__.py
+
+      - name: Smoke-test executable
+        shell: bash
+        env:
+          ARTIFACT: ${{ matrix.artifact }}
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            "./dist/${ARTIFACT}.exe" --version
+            "./dist/${ARTIFACT}.exe" --help >/dev/null
+          else
+            "./dist/${ARTIFACT}" --version
+            "./dist/${ARTIFACT}" --help >/dev/null
+          fi
+
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/${{ matrix.artifact }}${{ runner.os == 'Windows' && '.exe' || '' }}
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download executables
+        uses: actions/download-artifact@v4
+        with:
+          pattern: pdf-color-inverter-*
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" artifacts/* --generate-notes --title "$GITHUB_REF_NAME"
