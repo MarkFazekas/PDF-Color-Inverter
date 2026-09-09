@@ -11,7 +11,6 @@ import pymupdf
 from pdf_color_inverter.models import ConversionJob, TransformMode
 from pdf_color_inverter.transform import apply_threshold_in_place
 
-
 LOGGER = logging.getLogger(__name__)
 _PDF_POINTS_PER_INCH = 72
 
@@ -52,7 +51,7 @@ def _render_and_transform_page(page: pymupdf.Page, matrix: pymupdf.Matrix, job: 
         pixmap.invert_irect(pixmap.irect)
     else:
         apply_threshold_in_place(pixmap.samples_mv, pixmap.width, pixmap.height, job.settings)
-    return pixmap.tobytes("png")
+    return bytes(pixmap.tobytes("png"))
 
 
 def _insert_page(destination: pymupdf.Document, page_rect: pymupdf.Rect, image_bytes: bytes) -> None:
@@ -83,12 +82,22 @@ def _temporary_output_path(output_path: Path) -> Path:
 
 def _validate_paths(job: ConversionJob) -> None:
     """Validate input and output paths before conversion starts."""
-    if not job.input_path.is_file():
-        msg = f"Input PDF does not exist: {job.input_path}"
+    _validate_input_path(job.input_path)
+    _validate_output_path(job)
+
+
+def _validate_input_path(input_path: Path) -> None:
+    """Validate the input PDF path."""
+    if not input_path.is_file():
+        msg = f"Input PDF does not exist: {input_path}"
         raise FileNotFoundError(msg)
-    if job.input_path.suffix.lower() != ".pdf":
-        msg = f"Input file is not a PDF: {job.input_path}"
+    if input_path.suffix.lower() != ".pdf":
+        msg = f"Input file is not a PDF: {input_path}"
         raise ValueError(msg)
+
+
+def _validate_output_path(job: ConversionJob) -> None:
+    """Validate the requested output path."""
     if job.input_path.resolve() == job.output_path.resolve():
         msg = "Input and output paths must be different"
         raise ValueError(msg)

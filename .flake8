@@ -9,7 +9,8 @@ ignore =
     WPS305,
     WPS237,
 per-file-ignores =
-    **/tests/*: S101,WPS201,WPS204,WPS210,WPS226,WPS235
+    src/pdf_color_inverter/__init__.py: WPS410,WPS412
+    **/tests/*: S101,WPS201,WPS204,WPS210,WPS226,WPS235,WPS432
 max_complexity = 8
 max_line_length = 120
 statistics = True

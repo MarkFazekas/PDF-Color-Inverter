@@ -1,9 +1,16 @@
 """Configuration models for PDF conversion."""
 
+from __future__ import annotations
+
 from enum import StrEnum
 from pathlib import Path
 
 from pydantic import BaseModel, Field, model_validator
+
+DEFAULT_DPI = 600
+MIN_DPI = 72
+MAX_DPI = 2400
+MAX_CHANNEL_VALUE = 255
 
 
 class TransformMode(StrEnum):
@@ -24,13 +31,13 @@ class ThresholdSide(StrEnum):
 class ConversionSettings(BaseModel):
     """Validated image conversion settings."""
 
-    dpi: int = Field(default=600, ge=72, le=2400)
+    dpi: int = Field(default=DEFAULT_DPI, ge=MIN_DPI, le=MAX_DPI)
     mode: TransformMode = TransformMode.INVERT
-    threshold: int | None = Field(default=None, ge=0, le=255)
+    threshold: int | None = Field(default=None, ge=0, le=MAX_CHANNEL_VALUE)
     side: ThresholdSide | None = None
 
     @model_validator(mode="after")
-    def validate_threshold_settings(self) -> "ConversionSettings":
+    def validate_threshold_settings(self) -> ConversionSettings:
         """Ensure threshold arguments are used only in threshold mode."""
         if self.mode is TransformMode.THRESHOLD and self.threshold is None:
             msg = "threshold is required when mode is 'threshold'"
