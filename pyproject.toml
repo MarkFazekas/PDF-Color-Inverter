@@ -12,6 +12,26 @@ license = { file = "LICENSE" }
 authors = [{ name = "Mark Fazekas" }]
 dependencies = ["numpy==2.3.5", "PyMuPDF==1.26.7", "pydantic==2.13.4"]
 
+[project.optional-dependencies]
+dev = [
+    "flake8==7.3.0",
+    "flake8-annotations==3.2.0",
+    "flake8-assertive==2.2.0",
+    "flake8-bugbear==25.11.29",
+    "flake8-builtins==3.1.0",
+    "flake8-comprehensions==3.17.0",
+    "flake8-eradicate==1.5.0",
+    "flake8-print==5.0.0",
+    "flake8-pydantic==0.4.0",
+    "flake8-spellcheck==0.28.0",
+    "mypy==2.3.0",
+    "pep8-naming==0.15.1",
+    "pyinstaller>=6.16,<7",
+    "pytest==9.1.1",
+    "ruff==0.16.0",
+    "wemake-python-styleguide==1.7.0",
+]
+
 [project.scripts]
 pdf-color-inverter = "pdf_color_inverter.cli:main"
 
